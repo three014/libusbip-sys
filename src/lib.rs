@@ -15,7 +15,3 @@ pub enum hub_speed {
     HUB_SPEED_HIGH = 0,
     HUB_SPEED_SUPER,
 }
-
-
-fn foo() {
-}

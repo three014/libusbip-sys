@@ -3,6 +3,13 @@ name = "libusbip-sys"
 version = "0.1.0"
 edition = "2021"
 authors = ["Aaron Perez <aap7640@gmail.com>"]
+description = "FFI bindings to libusbip"
+license-file = "LICENSE"
+keywords = ["usb", "bindings", "tcp", "sysfs"]
+homepage = "https://github.com/three014/libusbip-sys"
+repository = "https://github.com/three014/libusbip-sys"
+readme = "README.md"
+categories = ["external-ffi-bindings", "os::unix-apis"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
