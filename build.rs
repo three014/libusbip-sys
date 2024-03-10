@@ -39,5 +39,10 @@ fn bindgen_config() -> io::Result<bindgen::Builder> {
         config = config.allowlist_var(line?);
     }
 
+    let reader = BufReader::new(File::open("config/usbip/disallowed_types.txt")?);
+    for line in reader.lines() {
+        config = config.blocklist_type(line?);
+    }
+
     Ok(config.parse_callbacks(Box::new(bindgen::CargoCallbacks::new())))
 }
