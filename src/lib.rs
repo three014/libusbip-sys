@@ -11,14 +11,14 @@ pub const USBIDS_FILE: &str = "/usr/share/hwdata/usb.ids";
 pub const USBIP_VHCI_DRV_NAME: &str = "vhci_hcd";
 pub const VHCI_STATE_PATH: &str = "/var/run/vhci_hcd";
 
-#[repr(u32)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum hub_speed {
     HUB_SPEED_HIGH = 0,
     HUB_SPEED_SUPER,
 }
 
-#[repr(u32)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum usbip_device_status {
     /* sdev is available. */
@@ -47,4 +47,17 @@ pub struct usbip_imported_device {
     pub devnum: u8,
     pub udev: usbip_usb_device
 }
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum op_code_status {
+    ST_OK = 0x00,
+    ST_NA = 0x01,
+    ST_DEV_BUSY = 0x02,
+    ST_DEV_ERR = 0x03,
+    ST_NODEV = 0x04,
+    ST_ERROR = 0x05,
+}
+
+
 
