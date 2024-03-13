@@ -3,6 +3,41 @@ use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::{env, io};
 
+struct ConfigMap {
+    file: &'static str,
+    func: fn(bindgen::Builder, String) -> bindgen::Builder,
+}
+
+impl ConfigMap {
+    pub fn call(&self, mut b: bindgen::Builder) -> io::Result<bindgen::Builder> {
+        let reader = BufReader::new(File::open(&self.file)?);
+        for line in reader.lines() {
+            b = (self.func)(b, line?);
+        }
+
+        Ok(b)
+    }
+}
+
+static CONFIG: [ConfigMap; 4] = [
+    ConfigMap {
+        file: "config/linux/usbip/allowed_functions.txt",
+        func: bindgen::Builder::allowlist_function,
+    },
+    ConfigMap {
+        file: "config/linux/usbip/allowed_types.txt",
+        func: bindgen::Builder::allowlist_type,
+    },
+    ConfigMap {
+        file: "config/linux/usbip/allowed_vars.txt",
+        func: bindgen::Builder::allowlist_var,
+    },
+    ConfigMap {
+        file: "config/linux/usbip/disallowed_types.txt",
+        func: bindgen::Builder::blocklist_type,
+    },
+];
+
 fn main() {
     #[cfg(target_family = "unix")]
     {
@@ -34,38 +69,15 @@ const fn get_sys() -> &'static str {
 
 fn bindgen_config() -> io::Result<bindgen::Builder> {
     let platform = get_sys();
-    let mut config = bindgen::Builder::default()
+    let mut builder = bindgen::Builder::default()
         .header(format!("config/{platform}/wrapper.h"))
         .allowlist_recursively(false)
-        .allowlist_item("usbip_.*");
+        .allowlist_item("usbip_.*")
+        .allowlist_item("USBIP_API");
 
-    let reader = BufReader::new(File::open(format!(
-        "config/{platform}/usbip/allowed_functions.txt"
-    ))?);
-    for line in reader.lines() {
-        config = config.allowlist_function(line?);
+    for cfg in CONFIG.iter() {
+        builder = cfg.call(builder)?;
     }
 
-    let reader = BufReader::new(File::open(format!(
-        "config/{platform}/usbip/allowed_types.txt"
-    ))?);
-    for line in reader.lines() {
-        config = config.allowlist_type(line?);
-    }
-
-    let reader = BufReader::new(File::open(format!(
-        "config/{platform}/usbip/allowed_vars.txt"
-    ))?);
-    for line in reader.lines() {
-        config = config.allowlist_var(line?);
-    }
-
-    let reader = BufReader::new(File::open(format!(
-        "config/{platform}/usbip/disallowed_types.txt"
-    ))?);
-    for line in reader.lines() {
-        config = config.blocklist_type(line?);
-    }
-
-    Ok(config.parse_callbacks(Box::new(bindgen::CargoCallbacks::new())))
+    Ok(builder.parse_callbacks(Box::new(bindgen::CargoCallbacks::new())))
 }
