@@ -52,10 +52,6 @@ static UNIX: Config = Config {
     lib_name: "usbip",
     func_mappings: &[
         GenMap::File {
-            path: "config/linux/usbip/allowed_functions.txt",
-            func: bindgen::Builder::allowlist_function,
-        },
-        GenMap::File {
             path: "config/linux/usbip/allowed_types.txt",
             func: bindgen::Builder::allowlist_type,
         },
