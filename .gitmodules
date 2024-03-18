@@ -1,0 +1,3 @@
+[submodule "usbip-win2"]
+	path = usbip-win2
+	url = https://github.com/vadimgrn/usbip-win2

@@ -42,19 +42,27 @@ fn main() {
     #[cfg(target_family = "unix")]
     {
         println!("cargo:rustc-link-search=/usr/lib");
-        println!("cargo:rustc-link-lib=usbip");
-        println!("cargo:rerun-if-changed=config/linux/wrapper.h");
     }
 
-    let bindings = bindgen_config()
+    #[cfg(target_family = "windows")]
+    {
+        println!("cargo:rustc-link-search={}", r"usbip-win2\x64\Debug");
+    }
+
+    let wrapper: PathBuf = ["config", get_sys(), "wrapper.h"].iter().collect();
+
+    println!("cargo:rustc-link-lib=usbip");
+    println!("cargo:rerun-if-changed={}", wrapper.display());
+
+    let bindings = bindgen_config(wrapper)
         .unwrap()
         .generate()
         .expect("Unable to generate the bindings");
 
-    let path = PathBuf::from(format!("{}/{}.rs", env::var("OUT_DIR").unwrap(), get_sys()));
+    let output = PathBuf::from(format!("{}/{}.rs", env::var("OUT_DIR").unwrap(), get_sys()));
 
     bindings
-        .write_to_file(path)
+        .write_to_file(output)
         .expect("Couldn't write bindings!");
 }
 
@@ -68,13 +76,26 @@ const fn get_sys() -> &'static str {
     }
 }
 
-fn bindgen_config() -> io::Result<bindgen::Builder> {
-    let platform = get_sys();
+/// Creates the Bindgen configuration for
+/// the usbip library. In Linux we use
+/// libusbip (C), while in Windows we use
+/// usbip-win2 (C++).
+fn bindgen_config(wrapper: PathBuf) -> io::Result<bindgen::Builder> {
     let mut builder = bindgen::Builder::default()
-        .header(format!("config/{platform}/wrapper.h"))
-        .allowlist_recursively(false)
-        .allowlist_item("usbip_.*")
-        .allowlist_item("USBIP_API");
+        .header(wrapper.to_string_lossy())
+        .allowlist_recursively(false);
+
+    if cfg!(windows) {
+        builder = builder
+            .opaque_type("std::.*")
+            .clang_arg("-Iusbip-win2\\userspace\\")
+            .clang_arg("-x")
+            .clang_arg("c++")
+            .clang_arg(r"-std=c++20")
+            .allowlist_item("USBIP_API");
+    } else {
+        builder = builder.allowlist_item("usbip_.*");
+    }
 
     for cfg in CONFIG.iter() {
         builder = cfg.call(builder)?;

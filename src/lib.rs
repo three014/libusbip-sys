@@ -1,63 +1,64 @@
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-include!(concat!(env!("OUT_DIR"), "/linux.rs"));
+#[cfg(target_family = "unix")]
+pub mod unix {
 
-use libudev_sys::udev_device;
+    #![allow(non_upper_case_globals)]
+    #![allow(non_camel_case_types)]
+    #![allow(non_snake_case)]
+    include!(concat!(env!("OUT_DIR"), "/linux.rs"));
 
-pub const SYSFS_PATH_MAX: usize = 256;
-pub const SYSFS_BUS_ID_SIZE: usize = 32;
-pub const USBIDS_FILE: &str = "/usr/share/hwdata/usb.ids";
-pub const USBIP_VHCI_DRV_NAME: &str = "vhci_hcd";
-pub const VHCI_STATE_PATH: &str = "/var/run/vhci_hcd";
+    use libudev_sys::udev_device;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum hub_speed {
-    HUB_SPEED_HIGH = 0,
-    HUB_SPEED_SUPER,
+    pub const SYSFS_PATH_MAX: usize = 256;
+    pub const SYSFS_BUS_ID_SIZE: usize = 32;
+    pub const USBIDS_FILE: &str = "/usr/share/hwdata/usb.ids";
+    pub const USBIP_VHCI_DRV_NAME: &str = "vhci_hcd";
+    pub const VHCI_STATE_PATH: &str = "/var/run/vhci_hcd";
+
+    #[repr(C)]
+    #[derive(Debug, Clone, Copy)]
+    pub enum hub_speed {
+        HUB_SPEED_HIGH = 0,
+        HUB_SPEED_SUPER,
+    }
+
+    #[repr(C)]
+    #[derive(Debug, Clone, Copy)]
+    pub enum usbip_device_status {
+        /* sdev is available. */
+        SDEV_ST_AVAILABLE = 0x01,
+        /* sdev is now used. */
+        SDEV_ST_USED,
+        /* sdev is unusable because of a fatal error. */
+        SDEV_ST_ERROR,
+
+        /* vdev does not connect a remote device. */
+        VDEV_ST_NULL,
+        /* vdev is used, but the USB address is not assigned yet */
+        VDEV_ST_NOTASSIGNED,
+        VDEV_ST_USED,
+        VDEV_ST_ERROR,
+    }
+
+    #[repr(C)]
+    #[derive(Debug, Clone)]
+    pub struct usbip_imported_device {
+        pub hub: hub_speed,
+        pub port: u8,
+        pub status: usbip_device_status,
+        pub devid: u32,
+        pub busnum: u8,
+        pub devnum: u8,
+        pub udev: usbip_usb_device,
+    }
+
+    #[repr(C)]
+    #[derive(Debug, Clone, Copy)]
+    pub enum op_code_status {
+        ST_OK = 0x00,
+        ST_NA = 0x01,
+        ST_DEV_BUSY = 0x02,
+        ST_DEV_ERR = 0x03,
+        ST_NODEV = 0x04,
+        ST_ERROR = 0x05,
+    }
 }
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum usbip_device_status {
-    /* sdev is available. */
-	SDEV_ST_AVAILABLE = 0x01,
-	/* sdev is now used. */
-	SDEV_ST_USED,
-	/* sdev is unusable because of a fatal error. */
-	SDEV_ST_ERROR,
-
-	/* vdev does not connect a remote device. */
-	VDEV_ST_NULL,
-	/* vdev is used, but the USB address is not assigned yet */
-	VDEV_ST_NOTASSIGNED,
-	VDEV_ST_USED,
-	VDEV_ST_ERROR
-}
-
-#[repr(C)]
-#[derive(Debug, Clone)]
-pub struct usbip_imported_device {
-    pub hub: hub_speed,
-    pub port: u8,
-    pub status: usbip_device_status,
-    pub devid: u32,
-    pub busnum: u8,
-    pub devnum: u8,
-    pub udev: usbip_usb_device
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum op_code_status {
-    ST_OK = 0x00,
-    ST_NA = 0x01,
-    ST_DEV_BUSY = 0x02,
-    ST_DEV_ERR = 0x03,
-    ST_NODEV = 0x04,
-    ST_ERROR = 0x05,
-}
-
-
-
