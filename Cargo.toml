@@ -1,3 +1,4 @@
+workspace = { members = [ "unix","windows"] }
 [package]
 name = "libusbip-sys"
 version = "0.1.0"
@@ -10,6 +11,7 @@ homepage = "https://github.com/three014/libusbip-sys"
 repository = "https://github.com/three014/libusbip-sys"
 readme = "README.md"
 categories = ["external-ffi-bindings", "os::unix-apis"]
+links = "usbip"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -94,7 +94,6 @@ fn main() {
 
     println!("cargo:rustc-link-search={}", config.link_search);
     println!("cargo:rustc-link-lib={}", config.lib_name);
-    println!("cargo:rerun-if-changed={}", config.wrapper);
 
     let bindings = bindgen_config(config)
         .unwrap()
@@ -124,7 +123,6 @@ fn bindgen_config(config: &Config) -> io::Result<bindgen::Builder> {
             .clang_arg("-x")
             .clang_arg("c++")
             .clang_arg(r"-std=c++20")
-            .allowlist_item("USBIP_API");
     }
 
     for cfg in config.func_mappings.iter() {
