@@ -16,12 +16,7 @@ links = "usbip"
 
 [dependencies]
 libc = "0.2.153"
-
-[target.'cfg(unix)'.dependencies]
 libudev-sys = "0.1.4"
 
-[target.'cfg(unix)'.build-dependencies]
+[build-dependencies]
 bindgen = "0.69.4"
-
-[target.'cfg(windows)'.build-dependencies]
-cxx = { version = "1.0.119", features = ["c++20"] }

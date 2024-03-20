@@ -4,7 +4,7 @@ pub mod unix {
     #![allow(non_upper_case_globals)]
     #![allow(non_camel_case_types)]
     #![allow(non_snake_case)]
-    include!(concat!(env!("OUT_DIR"), "/linux.rs"));
+    include!(concat!(env!("OUT_DIR"), "/unix.rs"));
 
     use libudev_sys::udev_device;
 
@@ -61,14 +61,4 @@ pub mod unix {
         ST_NODEV = 0x04,
         ST_ERROR = 0x05,
     }
-}
-
-#[cfg(target_family = "windows")]
-pub mod windows {
-
-    #![allow(non_upper_case_globals)]
-    #![allow(non_camel_case_types)]
-    #![allow(non_snake_case)]
-    include!(concat!(env!("OUT_DIR"), "/windows.rs"));
-   
 }

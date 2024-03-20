@@ -1,11 +1,10 @@
+pub use ::bindgen::Builder;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
 
 pub struct Config {
     pub wrapper: &'static str,
-    pub link_search: &'static str,
-    pub lib_name: &'static str,
     pub func_mappings: &'static [GenMap],
     pub output: fn() -> PathBuf,
 }
